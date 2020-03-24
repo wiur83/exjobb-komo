@@ -60,7 +60,14 @@ app.post("/register", async (req, res) => {
                 return response.json();
             })
             .then(function (result) {
-                res.redirect('./login');
+                console.log(result);
+                if (result.msg == "error") {
+                    res.render("error.ejs", { msg: result.text });
+                } else if (result.msg == "success") {
+                    res.redirect('./login');
+                } else {
+                    res.render("error.ejs", { msg: "Something went wrong" });
+                }
             })
     } catch(err) {
           console.log(err);
@@ -88,8 +95,15 @@ app.post("/login", async (req, res) => {
                 return response.json();
             })
             .then(function (result) {
-                globalToken = result.msg;
-                res.redirect('./talk');
+                if (result.msg == "error") {
+                    res.render("error.ejs", { msg: result.text });
+                } else if (result.msg == "token") {
+                    globalToken = result.text;
+                    res.redirect('./talk');
+                } else {
+                    res.render("error.ejs", { msg: "Something went wrong" });
+                }
+
             })
     } catch(err) {
           console.log(err);
@@ -136,6 +150,11 @@ app.get("/talk", async (req, res) => {
 
 });
 
+
+//logout GET
+app.get("/error", (req, res) => {
+    res.render("talk.ejs", {msg: "error"});
+});
 
 
 //middleware
