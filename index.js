@@ -104,12 +104,12 @@ app.get("/logout", (req, res) => {
 });
 
 
-//TEST ROUTE(testing moddleware)
+//Talk GET
 app.get("/talk", async (req, res) => {
     const token = globalToken;
 
     try {
-        await fetch(`${api_adress}/talk-server`, {
+        await fetch(`${api_adress}/api/user/talk-server`, {
             method: 'post',
             headers: {
                 'Accept': 'application/json, text/plain, */*',
@@ -135,13 +135,6 @@ app.get("/talk", async (req, res) => {
     }
 
 });
-
-
-//Token test POST
-app.post("/talk-server", verify, async (req, res) => {
-    res.json({ msg: req.user });
-});
-
 
 
 

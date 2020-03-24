@@ -3,7 +3,7 @@ const User = require("../model/User");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { registerValidation, loginValidation } = require("../validation");
-
+const verify = require("./verifyToken");
 
 //REGISTRATION ROUTE
 router.post("/register", async (req, res) => {
@@ -53,7 +53,11 @@ router.post("/login", async (req, res) => {
     console.log("token-login");
 
     res.json({ msg: token });
+});
 
+//Token test POST
+router.post("/talk-server", verify, async (req, res) => {
+    res.json({ msg: req.user });
 });
 
 module.exports = router;
