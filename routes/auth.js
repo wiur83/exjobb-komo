@@ -4,25 +4,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { registerValidation, loginValidation } = require("../validation");
 const verify = require("./verifyToken");
-
-// // *************** databas grejor ****************
-// const sqlite3 = require('sqlite3').verbose();
-// const path = require('path')
-// const dbPath = path.resolve("db", 'texts.sqlite')
-// let db = new sqlite3.Database(dbPath, (err) => {
-// 	if(err) {
-// 		return console.log(err.message);
-// 	}
-// 	console.log("Connected to database!")
-// });
-
 const sqlite3 = require('sqlite3').verbose();
 
+//DB connect
 let db = new sqlite3.Database('./db/texts.sqlite', (err) => {
   if (err) {
     console.error(err.message);
   }
-  console.log('Connected to the texts database.');
 });
 
 
@@ -39,11 +27,11 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
     //Random id creation
-    let random_id = (Math.floor(Math.random() * 10000000000));
-    console.log(random_id);
+    let random_id = (Math.floor(Math.random() * 1000000000000));
+    // console.log(random_id);
 
     //Check if email exist
-    db.each("SELECT COUNT(*) AS total FROM users WHERE email = ?",
+    db.each("SELECT COUNT(*) AS total FROM users WHERE email LIKE ?",
     req.body.email,(err, row) => {
         if (row.total == 1) {
             //Email exists
@@ -70,24 +58,34 @@ router.post("/login", async (req, res) => {
     if (error) return res.json({ msg: "error", text: error.details[0].message });
 
     //Check if email exist
-    db.each("SELECT * FROM users WHERE email = ?",
+    db.each("SELECT COUNT(*) AS total FROM users WHERE email LIKE ?",
     req.body.email, async (err, row) => {
-        if (err) {
-            //Email does not exist
-        	return res.json({ msg: "error", text: "Email does not exist?" });
+        if (row.total == 0) {
+            //Email not exists
+            res.json({ msg: "error", text: "Email not found" });
         } else {
             //email exist
-            //Check if password is correct
-            const validPass = await bcrypt.compare(req.body.password, row.password);
-            if (!validPass) return res.json({ msg: "error", text: "Wrong password!!" });
-            //Create, asignand return jwt-token
-            const token = jwt.sign({id: row.backup_id}, process.env.TOKEN_SECRET);
-            res.json({ msg: "token", text: token });
+            db.each("SELECT * FROM users WHERE email LIKE ?",
+            req.body.email, async (err, row) => {
+                if (err) {
+                    //Err
+                	return res.json({ msg: "error", text: "Something went wrong" });
+                } else {
+                    //Check if password is correct
+                    const validPass = await bcrypt.compare(req.body.password, row.password);
+                    if (!validPass) return res.json({ msg: "error", text: "Wrong password!!" });
+                    //Create, asignand return jwt-token
+                    const token = jwt.sign({id: row.backup_id}, process.env.TOKEN_SECRET);
+        
+
+                    res.json({ msg: "token", text: token, backup_id: row.backup_id });
+                }
+            });
         }
     });
 });
 
-//Token test POST
+//Talk POST
 router.post("/talk-server", verify, async (req, res) => {
     res.json({ msg: req.user });
 });

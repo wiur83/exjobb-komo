@@ -2,17 +2,33 @@
 const express = require('express');
 const app = express();
 const dotenv = require("dotenv");
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 var cors = require('cors');
 const fetch = require("node-fetch");
 //Importing routes
 const authRoute = require("./routes/auth");
+
 const verify = require("./routes/verifyToken");
 //Variables
-let globalToken = "";
+global.globalToken = "";
+global.userBackupId = "";
+global.words = [];
+global.userWords = [];
+global.counterWords = 0;
+global.currentWord = "";
+global.currentResWords = [];
+global.subWord = "";
+global.result = "";
+
+
 const api_adress = "http://localhost:3000";
 const port = 3000;
+
+//TEst class
+const Voice = require('./model/Voice');
+const VoiceMethods = require('./model/Voice');
+
 
 
 //CONFIGURATIONS
@@ -28,10 +44,7 @@ app.set('view engine', 'ejs');
 // Set css middleware
 app.use("/", express.static("assets"));
 
-//connecting to db
-mongoose.connect( process.env.DB_CONNECT, {useNewUrlParser: true, useUnifiedTopology: true}, () =>
-    console.log("connected to DB")
-);
+
 
 //Index GET
 app.get("/", (req, res) => {
@@ -60,7 +73,6 @@ app.post("/register", async (req, res) => {
                 return response.json();
             })
             .then(function (result) {
-                console.log(result);
                 if (result.msg == "error") {
                     res.render("error.ejs", { msg: result.text });
                 } else if (result.msg == "success") {
@@ -94,12 +106,22 @@ app.post("/login", async (req, res) => {
             }).then(function (response) {
                 return response.json();
             })
-            .then(function (result) {
+            .then(async function (result) {
                 if (result.msg == "error") {
                     res.render("error.ejs", { msg: result.text });
                 } else if (result.msg == "token") {
                     globalToken = result.text;
-                    res.redirect('./talk');
+                    userBackupId = result.backup_id;
+                    global.words = await VoiceMethods.getWords();
+                    await VoiceMethods.setUserWords();
+                    global.userWords = await VoiceMethods.getUserWords();
+
+
+                    global.counterWords = await VoiceMethods.getCounterWords();
+
+                    global.startCounter = 0;
+                    global.score = 0;
+                    res.redirect('./talk-login');
                 } else {
                     res.render("error.ejs", { msg: "Something went wrong" });
                 }
@@ -107,9 +129,92 @@ app.post("/login", async (req, res) => {
             })
     } catch(err) {
           console.log(err);
-          res.status(400).send(err);
+          res.render("error.ejs", {msg: "Ops! Something went wrong. Try again."});
     }
 });
+
+//Talk GET
+app.get("/restart", verify, async (req, res) => {
+    global.words = await VoiceMethods.getWords();
+    await VoiceMethods.setUserWords();
+    global.userWords = await VoiceMethods.getUserWords();
+    global.counterWords = await VoiceMethods.getCounterWords();
+    global.startCounter = 0;
+    global.score = 0;
+    res.redirect('./talk-login');
+});
+
+
+//Talk GET
+app.get("/talk-login", verify, async (req, res) => {
+    if (req.user == "Access denied") {
+        res.render("error.ejs", {msg: "Please login"});
+    } else if (req.user == "Invalid token") {
+        res.render("error.ejs", {msg: "Wrong email or password"});
+    } else {
+
+        //Set the current word + res_word
+        global.currentWord = Object.keys(global.userWords)[global.startCounter];
+        global.currentResWords = global.userWords[global.currentWord];
+
+
+        if (global.counterWords > global.startCounter) {
+            res.render("talk.ejs", {msg: Object.keys(global.userWords)[global.startCounter]});
+        } else {
+            // Lägg till resultatet i statestik
+            await VoiceMethods.addToStatistics();
+            res.render("finished.ejs", {score: global.score, total: global.counterWords});
+        }
+
+    }
+});
+
+//logout GET
+app.post("/submit", async (req, res) => {
+    global.startCounter = global.startCounter + 1;
+    var checkIfWordExist = global.currentResWords.includes(req.body.value);
+    global.subWord = req.body.value;
+    if (checkIfWordExist == true) {
+        // word exist
+        global.result = "Sucess";
+        //Add +1 to Nr_of_tries
+        await VoiceMethods.addToNrOfTries();
+        //Add point to score
+        global.score = global.score + 1;
+        //Change global.result to SUCCESS
+
+    } else {
+        // word does not exist
+        global.result = "Fail";
+
+        //Add word and resword
+        await VoiceMethods.addResWord();
+
+
+    }
+});
+
+//logout GET
+app.get("/submit", async (req, res) => {
+    res.render("result.ejs", {msg: global.result});
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //logout GET
 app.get("/logout", (req, res) => {
@@ -117,38 +222,6 @@ app.get("/logout", (req, res) => {
     res.redirect('./login')
 });
 
-
-//Talk GET
-app.get("/talk", async (req, res) => {
-    const token = globalToken;
-
-    try {
-        await fetch(`${api_adress}/api/user/talk-server`, {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Content-type': 'application/json'
-            },
-            body: JSON.stringify({
-              token: token
-            })
-            }).then(function (response) {
-                return response.json();
-            })
-            .then(async function (result) {
-                if (result.msg == "Access denied") {
-                    res.render("error.ejs", {msg: "Access denied"});
-                } else if (result.msg == "Invalid token") {
-                    res.render("error.ejs", {msg: "Wrong email or password"});
-                } else {
-                    res.render("talk.ejs");
-                }
-            })
-    } catch(err) {
-          res.render("error.ejs", {msg: "Ops! Something went wrong. Try again."});
-    }
-
-});
 
 
 //logout GET

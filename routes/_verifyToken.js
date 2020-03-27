@@ -1,7 +1,9 @@
 const jwt = require("jsonwebtoken");
 
 module.exports = function(req, res, next) {
-    const token = global.globalToken;
+    console.log(globalToken);
+    console.log(global.globalToken);
+    const token = req.body.token;
     if (!token) {
         req.user = "Access denied";
         next();

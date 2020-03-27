@@ -1,9 +1,13 @@
 const btn = document.querySelector(".talk");
 const content = document.querySelector(".content");
+var xhr = new XMLHttpRequest();
 
-// const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
+
+//Get all words and sentances from DB
+
 
 recognition.onstart = function() {
     console.log("voice is active YO!");
@@ -16,6 +20,15 @@ recognition.onresult = function(event) {
 
     content.textContent = transcript;
     console.log(transcript);
+    xhr.open("POST", "submit", true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({
+        value: transcript
+    }));
+    // console.log("hello.. hotdog");
+    window.location.pathname = '/submit';
+
+
 };
 
 //Add listner to btn
