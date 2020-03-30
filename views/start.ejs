@@ -6,9 +6,10 @@
 <body>
     <div class="login-page">
         <div class="form">
-            <h1><%= msg %></h1>
-            <a href="../user/register">Register</a>
-            <a href="../user/login">Login</a>
+            <h1>Start</h1>
+            <form action="/voice/talk-login" method="GET" class="login-form">
+                <button type="talk-login">Start</button>
+            </form>
         </div>
     </div>
 </body>

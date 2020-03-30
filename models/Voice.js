@@ -24,6 +24,35 @@ module.exports = {
         })
     },
     //Innan start
+    setUserWords: async function() {
+        return new Promise(resolve => {
+            let wordsList = global.words;
+
+            for (let i = 0; i < wordsList.length; i++) {
+                db.get("SELECT COUNT(*) AS total FROM data WHERE word = ? AND user_id = ?",
+                wordsList[i],global.userBackupId,(err, row) => {
+                    if (err) {
+                        resolve(err);
+                    } else {
+                        if (row.total == 0) {
+                            //ord finns inte
+                            db.run("INSERT INTO data (user_id, word, res_word, nr_of_tries) VALUES (?, ?, ?, ?)",
+                                global.userBackupId, wordsList[i], wordsList[i], 1, (err) => {
+                                if (err) {
+                                    resolve(err);
+                                }
+                            });
+                        }
+                    }
+                    resolve("success");
+                });
+            }
+
+
+
+        })
+    },
+    //Innan start
     getUserWords: async function() {
         return new Promise(resolve => {
             db.all("SELECT * FROM data WHERE user_id = ?",
@@ -42,6 +71,7 @@ module.exports = {
                         }
 
                     }
+                    global.userWords = Obj;
                     resolve(Obj);
                 }
 
@@ -50,40 +80,19 @@ module.exports = {
 
         })
     },
-    //Innan start
-    setUserWords: async function() {
-        return new Promise(resolve => {
-            let wordsList = global.words;
-            for (let i = 0; i < wordsList.length; i++) {
-                db.get("SELECT COUNT(*) AS total FROM data WHERE word LIKE ?",
-                wordsList[i],(err, row) => {
-                    if (err) {
-                        resolve(err);
-                    } else {
-                        if (row.total == 0) {
-                            //ord finns inte
-                            db.run("INSERT INTO data (user_id, word, res_word, nr_of_tries) VALUES (?, ?, ?, ?)",
-                                global.userBackupId, wordsList[i], wordsList[i], 1, (err) => {
-                                if (err) {
-                                    resolve(err);
-                                }
-                            });
-                        }
-                    }
-                });
-                resolve("success");
-            }
-        })
-    },
+
     //Innan start
     getCounterWords: async function() {
         return new Promise(resolve => {
             let count = 0;
-            for (var c in global.userWords) {
+            for (var c in global.words) {
                 count = count + 1;
             }
+            global.counterWords = count;
+
             resolve(count);
         })
+
     },
     //Innan startglobal.currentWord
     addToNrOfTries: async function() {
@@ -129,6 +138,20 @@ module.exports = {
                 }
             });
             resolve("Sucess");
+        })
+    },
+    //resetStartCounter
+    resetStartCounter: async function() {
+        return new Promise(resolve => {
+            global.startCounter = 0;
+            resolve(0);
+        })
+    },
+    //resetStartCounter
+    resetScore: async function() {
+        return new Promise(resolve => {
+            global.score = 0;
+            resolve(0);
         })
     }
 

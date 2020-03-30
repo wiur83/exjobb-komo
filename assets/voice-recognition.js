@@ -20,13 +20,13 @@ recognition.onresult = function(event) {
 
     content.textContent = transcript;
     console.log(transcript);
-    xhr.open("POST", "submit", true);
+    xhr.open("POST", "/voice/submit", true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({
         value: transcript
     }));
     // console.log("hello.. hotdog");
-    window.location.pathname = '/submit';
+    window.location.pathname = '/voice/submit';
 
 
 };
