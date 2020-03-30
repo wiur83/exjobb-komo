@@ -21,6 +21,7 @@ router.use("/", express.static("assets"));
 
 //register GET
 router.get("/register", (req, res) => {
+    //Renders the register view
     res.render("../views/register.ejs");
 });
 //register POST
@@ -91,10 +92,12 @@ router.post("/register-push", async (req, res) => {
 
 //login GET
 router.get("/login", (req, res) => {
+    //Renders the login view
     res.render("../views/login.ejs");
 });
 //login POST
 router.post("/login", async (req, res) => {
+    //Login info is checked if OK
     try {
         await fetch(`${url_adress}/user/login-push`, {
             method: 'post',
@@ -111,25 +114,35 @@ router.post("/login", async (req, res) => {
             })
             .then(async function (result) {
                 if (result.msg == "error") {
+                    //The user was not logged in and error page is rendered
                     res.render("error.ejs", { msg: result.text });
                 } else if (result.msg == "token") {
+                    //The user is logged in
+
+                    //Token and user ID is stored in memory
                     global.globalToken = result.text;
                     global.userBackupId = result.backup_id;
+
+                    //Words are imported from words-table in DB and stored
+                    //in memory
                     global.words = await VoiceMethods.getWords();
+
+                    //List with words are stored in data-table together
+                    //with user ID
+                    //This only happens if new user or new words are added
+                    //in words-table
                     await VoiceMethods.setUserWords();
-
-
-
 
                     res.redirect('../voice/start');
                 } else {
+                    //The user was not logged in and error page is rendered
                     res.render("error.ejs", { msg: "Something went wrong" });
                 }
 
             })
     } catch(err) {
           console.log(err);
-          res.render("error.ejs", {msg: "Ops! Something went wrong. Try again."});
+          res.render("error.ejs", {msg: "Something went wrong"});
     }
 });
 

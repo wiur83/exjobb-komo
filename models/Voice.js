@@ -8,7 +8,7 @@ let db = new sqlite3.Database('./db/texts.sqlite', (err) => {
 });
 
 module.exports = {
-    //Vid register
+    //Vid login
     getWords: async function() {
         return new Promise(resolve => {
             let arrayWords = [];
@@ -23,7 +23,7 @@ module.exports = {
             });
         })
     },
-    //Innan start
+    //Vid login
     setUserWords: async function() {
         return new Promise(resolve => {
             let wordsList = global.words;
@@ -47,12 +47,9 @@ module.exports = {
                     resolve("success");
                 });
             }
-
-
-
         })
     },
-    //Innan start
+    //Vid login
     getUserWords: async function() {
         return new Promise(resolve => {
             db.all("SELECT * FROM data WHERE user_id = ?",
@@ -62,7 +59,6 @@ module.exports = {
                     resolve(err);
                 } else {
                     let Obj = {};
-                    // var obj = {key1: ["val1", "val2", "val3"], key2: "value2"};
                     for (let i = 0; i < row.length; i++) {
                         if (!(row[i]["word"] in Obj)) {
                             Obj[row[i]["word"]] = [row[i]["res_word"]];
@@ -81,7 +77,7 @@ module.exports = {
         })
     },
 
-    //Innan start
+    //Vid login
     getCounterWords: async function() {
         return new Promise(resolve => {
             let count = 0;
@@ -94,7 +90,7 @@ module.exports = {
         })
 
     },
-    //Innan startglobal.currentWord
+    //Lägger till ett(+1) på räknaren i DB om ordet redan finns
     addToNrOfTries: async function() {
         return new Promise(resolve => {
             db.get("SELECT nr_of_tries FROM data WHERE user_id = ? AND res_word = ?",
@@ -114,10 +110,9 @@ module.exports = {
             });
         })
     },
-    //addResWord
+    //Lägger till ordet som var "fel" i res_word tillsammans emd user_id
     addResWord: async function() {
         return new Promise(resolve => {
-            //Gör saler global.currentWord
             db.run("INSERT INTO data (user_id, word, res_word, nr_of_tries) VALUES (?, ?, ?, ?)",
                 global.userBackupId, global.currentWord, global.subWord, 1, (err) => {
                 if (err) {
@@ -127,10 +122,9 @@ module.exports = {
             resolve("Sucess");
         })
     },
-    //addResWord
+    //Sparar poäng i statisctis tabellen
     addToStatistics: async function() {
         return new Promise(resolve => {
-            //Gör saler global.currentWord
             db.run("INSERT INTO statistics (user_id, score, total_score) VALUES (?, ?, ?)",
                 global.userBackupId, global.score, global.counterWords, (err) => {
                 if (err) {
@@ -140,14 +134,14 @@ module.exports = {
             resolve("Sucess");
         })
     },
-    //resetStartCounter
+    //Nollställer startCounter
     resetStartCounter: async function() {
         return new Promise(resolve => {
             global.startCounter = 0;
             resolve(0);
         })
     },
-    //resetStartCounter
+    //Nollställer score
     resetScore: async function() {
         return new Promise(resolve => {
             global.score = 0;
