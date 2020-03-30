@@ -68,8 +68,9 @@ router.post("/submit", async (req, res) => {
     //Adds one(1) to startCounter
     global.startCounter = global.startCounter + 1;
 
-    //Checks if word exists
-    var checkIfWordExist = global.currentResWords.includes(req.body.value);
+
+    //Checks if word exists under res_word for current word
+    let checkIfWordExist = global.currentResWords.includes(req.body.value);
     //Sets submitted word to memory
     global.subWord = req.body.value;
     if (checkIfWordExist == true) {
@@ -77,19 +78,26 @@ router.post("/submit", async (req, res) => {
         global.result = "Success";
         await VoiceMethods.addToNrOfTries();
         global.score = global.score + 1;
-
-
     } else {
         // word does not exist
-        global.result = "Fail";
-        await VoiceMethods.addResWord();
+
+        // Check that no clash with other word
+        let checkNoClash = global.words.includes(req.body.value);
+        if (checkNoClash == true) {
+            //Clash. Word not added to res_word
+            global.result = "Fail";
+        } else {
+            //No clash. Word added to res_word
+            global.result = "Fail";
+            await VoiceMethods.addResWord();
+        }
     }
 });
 
 
 //restart GET
 router.get("/restart", verify, async (req, res) => {
-    //Resets all memory variables and loads in all words (incl new res_words) 
+    //Resets all memory variables and loads in all words (incl new res_words)
     global.words = await VoiceMethods.getWords();
     await VoiceMethods.setUserWords();
     global.userWords = await VoiceMethods.getUserWords();
