@@ -62,16 +62,16 @@ router.get("/talk-login", verify, async (req, res) => {
 router.post("/submit", async (req, res) => {
     //Adds one(1) to startCounter
     global.startCounter = global.startCounter + 1;
-    //Sets submitted word to memory
-    global.subWord = req.body.value;
+    //Sets submitted word to memory(so addToNrOfTries can run correctly)
+    global.subWord = req.body.value.toLowerCase();
 
 
     //Checks if word exists under res_word for current word
-    let checkIfWordExist = global.currentResWords.includes(req.body.value);
+    let checkIfWordExist = global.currentResWords.includes(global.subWord);
 
     if (checkIfWordExist == true) {
         // word exist
-        global.result = "rätt";
+        // global.result = "rätt";
         await VoiceMethods.addToNrOfTries();
         global.score = global.score + 1;
         res.redirect('./talk-login');
@@ -79,15 +79,15 @@ router.post("/submit", async (req, res) => {
         // word does not exist
 
         // Check that no clash with other word
-        let checkNoClash = global.words.includes(req.body.value);
+        let checkNoClash = global.words.includes(global.subWord);
 
         if (checkNoClash == true) {
             //Clash. Word not added to res_word
-            global.result = "fel";
+            // global.result = "fel";
             res.redirect('./talk-login');
         } else {
             //No clash. Word added to res_word
-            global.result = "fel";
+            // global.result = "fel";
             await VoiceMethods.addResWord();
             res.redirect('./talk-login');
         }
