@@ -75,7 +75,7 @@ router.post("/submit", async (req, res) => {
     global.subWord = req.body.value;
     if (checkIfWordExist == true) {
         // word exist
-        global.result = "Success";
+        global.result = "Rätt";
         await VoiceMethods.addToNrOfTries();
         global.score = global.score + 1;
     } else {
@@ -83,12 +83,13 @@ router.post("/submit", async (req, res) => {
 
         // Check that no clash with other word
         let checkNoClash = global.words.includes(req.body.value);
+
         if (checkNoClash == true) {
             //Clash. Word not added to res_word
-            global.result = "Fail";
+            global.result = "Fel";
         } else {
             //No clash. Word added to res_word
-            global.result = "Fail";
+            global.result = "Fel";
             await VoiceMethods.addResWord();
         }
     }

@@ -1,26 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <meta http-equiv="X-UA-Compatible" conent="ie=edge">
+    <title>Speech recognition app</title>
 </head>
 <body>
-    <div class="login-page">
-        <div class="form">
-            <h2>Register account</h2>
+    <div class="login-page-intro">
+        <div class="form-intro">
+            <h2>Registrera ett konto</h2>
             <form action="register" method="POST" class="login-form">
                 <div>
-                    <input type="text" id="name" name="name" placeholder="name" required>
+                    <input type="text" id="name" name="name" placeholder="namn" required>
                 </div>
                 <div>
-                    <input type="email" id="email" name="email" placeholder="email" required>
+                    <input type="email" id="email" name="email" placeholder="epost" required>
                 </div>
                 <div>
-                    <input type="password" id="password" name="password" placeholder="password" required>
+                    <input type="password" id="password" name="password" placeholder="lösenord" required>
                 </div>
-                <button type="submit">Register</button>
+                <button type="submit">Registrera</button>
             </form
         </div>
-        <p class="message">Already registered? <a href="login">Sign In</a></p>
+        <p class="message">Har du redan ett konto? <a href="login">Logga in</a></p>
     </div>
 
 </body>

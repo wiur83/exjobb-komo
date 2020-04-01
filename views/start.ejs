@@ -1,17 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <meta http-equiv="X-UA-Compatible" conent="ie=edge">
+    <title>Speech recognition app</title>
 </head>
 <body>
-    <div class="login-page">
-        <div class="form">
-            <h3>Please don´t talk before or after the given word</h3>
-            <h3>Talk as clearly as possible</h3>
-            <h3>Keep repeating by clicking TALK again, if it does not register the word</h3>
-            <h3>Thank you :)</h3>
+    <div class="login-page-intro">
+        <div class="form-intro">
+            <h1>Instruktioner</h1>
+            <h4>Du kommer att få ett ord eller mening på engelska uskrivet. Klicka på "spela in" och läs upp texten som anges</h4>
+            <h4>Vid första inspelningen kommer webläsaren fråga om tillstånd att använda mikrofonen. Vänligen godkänn detta då vi behöver den för at det skall fungera</h4>
+            <h4>Appen lagrar <u>inga</u> ljudfiler av det du läser upp utan endast text-snutten efter tolkning</h4>
+            <h4>Inspelningen avslutas automatiskt när det bli tyst. Så för att få bästa möjliga resultat är det viktigt att man är tyst i några sekunder efter varje ord/mening</h4>
+            <h4>Prata tydligt in i mikrofonen</h4>
+            <h4>Om testet inte går vidare efter inspelninge och minst 3 sekunder har passerat så kunde inte ordet tolkas. Testa då igen lite närmare mikrofonen. Skulle det mot förmodan inte fungera efter ett flertal försök kan man spela in ordet "skipp" för att hoppa vidare</h4>
+            <h4>Klicka på START för att köra igång. Tack! :) </h4>
             <form action="/voice/talk-login" method="GET" class="login-form">
-                <button type="talk-login">Start</button>
+                <button type="talk-login">START</button>
             </form>
         </div>
     </div>
