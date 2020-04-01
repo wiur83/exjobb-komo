@@ -14,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //Variables
-const port = 3000;
+const port = 8333;
 global.globalToken = "";
 global.userBackupId = "";
 global.words = [];
