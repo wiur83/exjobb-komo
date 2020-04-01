@@ -6,7 +6,7 @@ const sqlite3 = require('sqlite3').verbose();
 const fetch = require("node-fetch");
 const VoiceMethods = require('../models/Voice');
 const { registerValidation, loginValidation } = require("../validation");
-const url_adress = "http://localhost:3000";
+const url_adress = "http://localhost:8333";
 
 
 //DB connect
