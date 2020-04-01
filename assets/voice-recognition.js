@@ -26,7 +26,8 @@ recognition.onresult = function(event) {
         value: transcript
     }));
     // console.log("hello.. hotdog");
-    window.location.pathname = '/voice/submit';
+    setTimeout(function(){ window.location.pathname = '/voice/talk-login'; }, 800);
+
 
 
 };

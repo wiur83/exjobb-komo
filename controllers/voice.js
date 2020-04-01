@@ -58,26 +58,23 @@ router.get("/talk-login", verify, async (req, res) => {
 });
 
 
-//submit GET
-router.get("/submit", async (req, res) => {
-    res.render("../views/result.ejs", {msg: global.result});
-});
-
 //submit POST
 router.post("/submit", async (req, res) => {
     //Adds one(1) to startCounter
     global.startCounter = global.startCounter + 1;
+    //Sets submitted word to memory
+    global.subWord = req.body.value;
 
 
     //Checks if word exists under res_word for current word
     let checkIfWordExist = global.currentResWords.includes(req.body.value);
-    //Sets submitted word to memory
-    global.subWord = req.body.value;
+
     if (checkIfWordExist == true) {
         // word exist
-        global.result = "Rätt";
+        global.result = "rätt";
         await VoiceMethods.addToNrOfTries();
         global.score = global.score + 1;
+        res.redirect('./talk-login');
     } else {
         // word does not exist
 
@@ -86,13 +83,20 @@ router.post("/submit", async (req, res) => {
 
         if (checkNoClash == true) {
             //Clash. Word not added to res_word
-            global.result = "Fel";
+            global.result = "fel";
+            res.redirect('./talk-login');
         } else {
             //No clash. Word added to res_word
-            global.result = "Fel";
+            global.result = "fel";
             await VoiceMethods.addResWord();
+            res.redirect('./talk-login');
         }
     }
+});
+
+//submit GET
+router.get("/submit", async (req, res) => {
+    res.render("../views/result.ejs", {msg: global.result, result: global.subWord});
 });
 
 

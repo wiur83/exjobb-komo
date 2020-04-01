@@ -119,7 +119,7 @@ module.exports = {
                     resolve(err);
                 }
             });
-            resolve("Sucess");
+            resolve("Success");
         })
     },
     //Sparar poäng i statisctis tabellen
@@ -131,7 +131,7 @@ module.exports = {
                     resolve(err);
                 }
             });
-            resolve("Sucess");
+            resolve("Success");
         })
     },
     //Nollställer startCounter
